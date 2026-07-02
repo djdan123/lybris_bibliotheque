@@ -13,7 +13,7 @@ export default function Editeurs() {
 
   const handleSubmit = () => {
     if (editing) {
-      updatePublisher(editing.id, form);
+      updatePublisher(editing._id, form);
     } else {
       addPublisher({ ...form, books: 0 });
     }
@@ -55,7 +55,7 @@ export default function Editeurs() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
           {publishers.map(pub => (
-            <div key={pub.id} className="bg-white rounded-3xl p-6 shadow-sm hover:shadow transition-all">
+            <div key={pub._id} className="bg-white rounded-3xl p-6 shadow-sm hover:shadow transition-all">
               <div className="flex justify-between items-start">
                 <div>
                   <h3 className="font-semibold text-xl">{pub.name}</h3>
@@ -75,7 +75,7 @@ export default function Editeurs() {
               </div>
               <div className="flex gap-3 mt-6">
                 <button onClick={() => openEdit(pub)} className="flex-1 py-2 border border-gray-300 rounded-2xl hover:bg-gray-50">Modifier</button>
-                <button onClick={() => confirmDelete(pub.id, pub.name)} className="flex-1 py-2 bg-red-50 text-red-600 rounded-2xl hover:bg-red-100">Supprimer</button>
+                <button onClick={() => confirmDelete(pub._id, pub.name)} className="flex-1 py-2 bg-red-50 text-red-600 rounded-2xl hover:bg-red-100">Supprimer</button>
               </div>
             </div>
           ))}

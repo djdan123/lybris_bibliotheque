@@ -64,11 +64,11 @@ export default function Auteurs() {
       return;
     }
     if (editingAuthor) {
-      updateAuthor(editingAuthor.id, formData);
+      updateAuthor(editingAuthor._id, formData);
     } else {
       const newAuthor = {
         ...formData,
-        id: Date.now(),
+        //id: Date.now(),
         image: formData.image || `https://picsum.photos/id/${Math.floor(Math.random() * 100) + 64}/300/300`,
       };
       addAuthor(newAuthor);
@@ -119,7 +119,7 @@ export default function Auteurs() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredAuthors.map((author) => (
               <div
-                key={author.id}
+                key={author._id}
                 className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all"
               >
                 <div className="h-64 relative">
@@ -158,7 +158,7 @@ export default function Auteurs() {
                       Modifier
                     </button>
                     <button
-                      onClick={() => handleDelete(author.id, author.name)}
+                      onClick={() => handleDelete(author._id, author.name)}
                       className="flex-1 py-3 bg-red-50 text-red-600 rounded-2xl hover:bg-red-100 transition-colors"
                     >
                       Supprimer

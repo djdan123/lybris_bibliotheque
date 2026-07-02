@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { authService } from "../../services/authService";
+import toast from "react-hot-toast";
 import Sidebar from "../../components/Layout/Sidebar";
 import Topbar from "../../components/Layout/Topbar";
 
@@ -10,19 +12,34 @@ export default function Profile() {
     bio: "Administrateur de la bibliothèque Libri's Management...",
     avatar: "https://i.pravatar.cc/300", // Photo par défaut
   });
+  const [loading, setLoading] = useState(true);
 
-  // Charger depuis localStorage
   useEffect(() => {
-    const saved = localStorage.getItem("userProfile");
-    if (saved) setUser(JSON.parse(saved));
+    const fetchProfile = async () => {
+      try {
+        const response = await authService.getProfile();
+        setUser(response.data);
+      } catch (error) {
+        toast.error("Erreur chargement profil");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
   }, []);
 
-  // Sauvegarder
-  const handleSave = () => {
-    localStorage.setItem("userProfile", JSON.stringify(user));
-    alert("✅ Profil enregistré avec succès !");
-    // Recharger la page pour mettre à jour le Sidebar
-    window.location.reload();
+  const handleSave = async () => {
+    try {
+      await authService.updateProfile(user);
+      toast.success("Profil mis à jour");
+      const stored = JSON.parse(localStorage.getItem('currentUser'));
+      if (stored) {
+        localStorage.setItem('currentUser', JSON.stringify({ ...stored, ...user }));
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Erreur");
+    }
   };
 
   const handleChange = (e) => {

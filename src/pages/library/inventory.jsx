@@ -77,11 +77,11 @@ export default function Inventaire() {
     }
 
     if (editingBook) {
-      updateBook(editingBook.id, formData);
+      updateBook(editingBook._id, formData);
     } else {
       const newBook = {
         ...formData,
-        id: Date.now(),
+        //id: Date.now(),
         cover: formData.cover || `https://picsum.photos/id/${Math.floor(Math.random() * 200)}/300/420`,
       };
       addBook(newBook);
@@ -96,7 +96,7 @@ export default function Inventaire() {
   };
 
   const openStockModal = (book) => {
-    setStockAdjustId(book.id);
+    setStockAdjustId(book._id);
     setStockAdjustValue(book.stock);
   };
 
@@ -182,10 +182,10 @@ export default function Inventaire() {
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {filteredBooks.map((book) => (
-                <div key={book.id} className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                <div key={book._id} className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
                   <div className="relative">
                     <img
-                      src={book.cover || `https://picsum.photos/id/${book.id % 200}/300/420`}
+                      src={book.cover || `https://picsum.photos/id/${book._id % 200}/300/420`}
                       alt={book.title}
                       className="w-full h-64 object-cover"
                     />
@@ -225,7 +225,7 @@ export default function Inventaire() {
                         Modifier
                       </button>
                       <button
-                        onClick={() => handleDelete(book.id, book.title)}
+                        onClick={() => handleDelete(book._id, book.title)}
                         className="flex-1 py-2 text-sm bg-red-50 text-red-600 rounded-xl hover:bg-red-100"
                       >
                         Supprimer
@@ -260,7 +260,7 @@ export default function Inventaire() {
                 </thead>
                 <tbody>
                   {urgentBooks.map((book) => (
-                    <tr key={book.id} className="border-b last:border-none hover:bg-gray-50 transition-colors">
+                    <tr key={book._id} className="border-b last:border-none hover:bg-gray-50 transition-colors">
                       <td className="py-5 px-6">
                         <div>
                           <p className="font-medium">{book.title}</p>

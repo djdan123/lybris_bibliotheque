@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff, Globe } from "lucide-react";
+import { authService } from "../../services/authService";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -13,37 +14,47 @@ export default function Login() {
     password: "",
   });
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
     setError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (!formData.email || !formData.password) {
       setError("Email et mot de passe sont obligatoires");
       return;
     }
-
     if (!isLogin && !formData.name) {
       setError("Le nom est obligatoire pour l'inscription");
       return;
     }
 
-    // Simulation de connexion / inscription
-    const user = {
-      name: formData.name || "Daniel Matondo",
-      email: formData.email,
-      avatar: "https://i.pravatar.cc/300",
-    };
-
-    // Sauvegarder l'utilisateur connecté
-    localStorage.setItem("currentUser", JSON.stringify(user));
-    
-    // Redirection vers le dashboard
-    navigate("/dashboard");
+    setLoading(true);
+    try {
+      let response;
+      if (isLogin) {
+        response = await authService.login({
+          email: formData.email,
+          password: formData.password,
+        });
+      } else {
+        response = await authService.register({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        });
+      }
+      const { user, token } = response.data;
+      localStorage.setItem('currentUser', JSON.stringify({ ...user, token }));
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Une erreur est survenue');
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Connexion avec Google / Facebook (simulation)
@@ -149,9 +160,10 @@ export default function Login() {
 
           <button
             type="submit"
-            className="w-full bg-[#031633] text-white py-3.5 rounded-2xl font-semibold hover:bg-black transition-colors"
+            disabled={loading}
+            className="w-full bg-[#031633] text-white py-3.5 rounded-2xl font-semibold hover:bg-black transition-colors disabled:opacity-70"
           >
-            {isLogin ? "Se connecter" : "Créer mon compte"}
+            {loading ? "Chargement..." : (isLogin ? "Se connecter" : "Créer mon compte")}
           </button>
         </form>
 

@@ -102,7 +102,7 @@ export default function GestionInventaire() {
       return;
     }
     if (editingBook) {
-      updateBook(editingBook.id, formData);
+      updateBook(editingBook._id, formData);
     } else {
       const newBook = {
         ...formData,
@@ -124,7 +124,7 @@ export default function GestionInventaire() {
   };
 
   const openStockModal = (book) => {
-    setStockAdjustId(book.id);
+    setStockAdjustId(book._id);
     setStockAdjustValue(book.stock);
   };
 
@@ -145,7 +145,7 @@ export default function GestionInventaire() {
     if (selectedBookForOrder) {
       // Simuler une commande : on augmente le stock de 20 exemplaires
       const newStock = selectedBookForOrder.stock + 20;
-      updateStock(selectedBookForOrder.id, newStock);
+      updateStock(selectedBookForOrder._id, newStock);
       setOrderModalOpen(false);
       toast.success(`Commande passée pour ${selectedBookForOrder.title} (+20 exemplaires)`);
     }
@@ -266,7 +266,7 @@ export default function GestionInventaire() {
                       const progress = getStockPercentage(book.stock);
                       const isLowStock = book.stock < 10;
                       return (
-                        <tr key={book.id} className="hover:bg-gray-50 transition-colors">
+                        <tr key={book._id} className="hover:bg-gray-50 transition-colors">
                           <td className="px-6 py-5">
                             <div>
                               <p className="font-medium">{book.title}</p>
@@ -319,7 +319,7 @@ export default function GestionInventaire() {
                                 🔄
                               </button>
                               <button
-                                onClick={() => handleDelete(book.id, book.title)}
+                                onClick={() => handleDelete(book._id, book.title)}
                                 className="p-2 text-red-600 hover:bg-red-50 rounded-xl"
                                 title="Supprimer"
                               >
@@ -385,7 +385,7 @@ export default function GestionInventaire() {
                   <p className="text-gray-400 text-sm">Aucun réassort urgent.</p>
                 ) : (
                   urgentReplenishments.map((book) => (
-                    <div key={book.id} className="bg-white/10 rounded-2xl p-4">
+                    <div key={book._id} className="bg-white/10 rounded-2xl p-4">
                       <div className="flex justify-between items-start">
                         <div>
                           <p className="font-medium">{book.title}</p>

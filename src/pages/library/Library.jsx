@@ -66,14 +66,18 @@ export default function Library() {
     }
 
     if (editingBook) {
-      updateBook(editingBook.id, formData);
+      updateBook(editingBook._id, formData);
     } else {
       const newBook = {
-        ...formData,
-        id: Date.now(),
-        cover: formData.cover || `https://picsum.photos/id/${Math.floor(Math.random() * 200)}/300/420`,
-      };
-      addBook(newBook);
+  title: formData.title,
+  author: formData.author,
+  category: formData.category,
+  stock: formData.stock,
+  isbn: formData.isbn || '',
+  publisher: formData.publisher || '',
+  cover: formData.cover || `https://picsum.photos/id/${Math.floor(Math.random() * 200)}/300/420`,
+};
+addBook(newBook);
     }
     setIsModalOpen(false);
   };
@@ -117,7 +121,7 @@ export default function Library() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredBooks.map((book) => (
               <div
-                key={book.id}
+                key={book._id}
                 className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-md transition-all group"
               >
                 <div className="relative h-64 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center overflow-hidden">
@@ -150,7 +154,7 @@ export default function Library() {
                       Modifier
                     </button>
                     <button
-                      onClick={() => handleDelete(book.id, book.title)}
+                      onClick={() => handleDelete(book._id, book.title)}
                       className="flex-1 py-2 text-sm bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-colors"
                     >
                       Supprimer

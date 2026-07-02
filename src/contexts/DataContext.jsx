@@ -1,5 +1,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { getBooks, saveBooks, getAuthors, saveAuthors, getPublishers, savePublishers } from '../services/storage';
+import { bookService } from '../services/bookService';
+import { authorService } from '../services/authorService';
+import { publisherService } from '../services/publisherService';
 import toast from 'react-hot-toast';
 
 const DataContext = createContext();
@@ -7,92 +9,144 @@ const DataContext = createContext();
 export const useData = () => useContext(DataContext);
 
 export const DataProvider = ({ children }) => {
-  // État
   const [books, setBooks] = useState([]);
   const [authors, setAuthors] = useState([]);
   const [publishers, setPublishers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Chargement initial
   useEffect(() => {
-    setBooks(getBooks());
-    setAuthors(getAuthors());
-    setPublishers(getPublishers());
-    setLoading(false);
+    const fetchData = async () => {
+      // Vérifier si l'utilisateur est connecté (token présent)
+      const user = localStorage.getItem('currentUser');
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      try {
+        const [booksRes, authorsRes, publishersRes] = await Promise.all([
+          bookService.getAll(),
+          authorService.getAll(),
+          publisherService.getAll(),
+        ]);
+        setBooks(booksRes.data);
+        setAuthors(authorsRes.data);
+        setPublishers(publishersRes.data);
+      } catch (error) {
+        console.error('Erreur chargement données:', error);
+        toast.error('Erreur de chargement des données');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
-  // Persistance automatique
-  useEffect(() => {
-    if (!loading) saveBooks(books);
-  }, [books, loading]);
-
-  useEffect(() => {
-    if (!loading) saveAuthors(authors);
-  }, [authors, loading]);
-
-  useEffect(() => {
-    if (!loading) savePublishers(publishers);
-  }, [publishers, loading]);
-
   // CRUD Livres
-  const addBook = (book) => {
-    const newBook = { ...book, id: Date.now() };
-    setBooks([...books, newBook]);
-    toast.success('Livre ajouté avec succès');
-    return newBook;
+  const addBook = async (book) => {
+    try {
+      const response = await bookService.create(book);
+      setBooks([...books, response.data]);
+      toast.success('Livre ajouté avec succès');
+      return response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erreur');
+    }
   };
 
-  const updateBook = (id, updatedBook) => {
-    setBooks(books.map(book => book.id === id ? { ...book, ...updatedBook } : book));
-    toast.success('Livre mis à jour');
+  const updateBook = async (id, updatedBook) => {
+    try {
+      const response = await bookService.update(id, updatedBook);
+      setBooks(books.map(b => b.id === id ? response.data : b));
+      toast.success('Livre mis à jour');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erreur');
+    }
   };
 
-  const deleteBook = (id) => {
-    setBooks(books.filter(book => book.id !== id));
-    toast.success('Livre supprimé');
+  const deleteBook = async (id) => {
+    try {
+      await bookService.delete(id);
+      setBooks(books.filter(b => b.id !== id));
+      toast.success('Livre supprimé');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erreur');
+    }
   };
 
-  const updateStock = (id, newStock) => {
-    setBooks(books.map(book => book.id === id ? { ...book, stock: newStock } : book));
-    toast.success('Stock mis à jour');
+  const updateStock = async (id, stock) => {
+    try {
+      const response = await bookService.updateStock(id, stock);
+      setBooks(books.map(b => b.id === id ? response.data : b));
+      toast.success('Stock mis à jour');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erreur');
+    }
   };
 
   // CRUD Auteurs
-  const addAuthor = (author) => {
-    const newAuthor = { ...author, id: Date.now() };
-    setAuthors([...authors, newAuthor]);
-    toast.success('Auteur ajouté');
+  const addAuthor = async (author) => {
+    try {
+      const response = await authorService.create(author);
+      setAuthors([...authors, response.data]);
+      toast.success('Auteur ajouté');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erreur');
+    }
   };
 
-  const updateAuthor = (id, updatedAuthor) => {
-    setAuthors(authors.map(author => author.id === id ? { ...author, ...updatedAuthor } : author));
-    toast.success('Auteur modifié');
+  const updateAuthor = async (id, updatedAuthor) => {
+    try {
+      const response = await authorService.update(id, updatedAuthor);
+      setAuthors(authors.map(a => a.id === id ? response.data : a));
+      toast.success('Auteur modifié');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erreur');
+    }
   };
 
-  const deleteAuthor = (id) => {
-    setAuthors(authors.filter(author => author.id !== id));
-    toast.success('Auteur supprimé');
+  const deleteAuthor = async (id) => {
+    try {
+      await authorService.delete(id);
+      setAuthors(authors.filter(a => a.id !== id));
+      toast.success('Auteur supprimé');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erreur');
+    }
   };
 
   // CRUD Éditeurs
-  const addPublisher = (publisher) => {
-    const newPublisher = { ...publisher, id: Date.now() };
-    setPublishers([...publishers, newPublisher]);
-    toast.success('Éditeur ajouté');
+  const addPublisher = async (publisher) => {
+    try {
+      const response = await publisherService.create(publisher);
+      setPublishers([...publishers, response.data]);
+      toast.success('Éditeur ajouté');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erreur');
+    }
   };
 
-  const updatePublisher = (id, updatedPublisher) => {
-    setPublishers(publishers.map(p => p.id === id ? { ...p, ...updatedPublisher } : p));
-    toast.success('Éditeur modifié');
+  const updatePublisher = async (id, updatedPublisher) => {
+    try {
+      const response = await publisherService.update(id, updatedPublisher);
+      setPublishers(publishers.map(p => p.id === id ? response.data : p));
+      toast.success('Éditeur modifié');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erreur');
+    }
   };
 
-  const deletePublisher = (id) => {
-    setPublishers(publishers.filter(p => p.id !== id));
-    toast.success('Éditeur supprimé');
+  const deletePublisher = async (id) => {
+    try {
+      await publisherService.delete(id);
+      setPublishers(publishers.filter(p => p.id !== id));
+      toast.success('Éditeur supprimé');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erreur');
+    }
   };
 
   // Utilitaires
-  const getLowStockBooks = () => books.filter(book => book.stock < 10);
+  const getLowStockBooks = () => books.filter(b => b.stock < 10);
   const getTotalBooks = () => books.reduce((acc, b) => acc + b.stock, 0);
 
   return (
@@ -101,7 +155,7 @@ export const DataProvider = ({ children }) => {
       addBook, updateBook, deleteBook, updateStock,
       addAuthor, updateAuthor, deleteAuthor,
       addPublisher, updatePublisher, deletePublisher,
-      getLowStockBooks, getTotalBooks
+      getLowStockBooks, getTotalBooks,
     }}>
       {children}
     </DataContext.Provider>

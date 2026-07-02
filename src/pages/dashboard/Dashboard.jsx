@@ -20,27 +20,27 @@ export default function Dashboard() {
 
   const newBooksThisWeek = useMemo(() => {
     const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-    return books.filter(book => book.id > oneWeekAgo).length;
+    return books.filter(book => book._id > oneWeekAgo).length;
   }, [books]);
 
   // 2. Activités récentes
   const recentActivities = useMemo(() => {
     const bookActivities = books.map(book => ({
-      id: book.id,
+      id: book._id,
       type: "book",
       title: book.title,
       author: book.author,
-      timestamp: book.id,
+      timestamp: book._id,
       icon: "📖",
       bgColor: "bg-amber-100",
       iconColor: "text-amber-600",
       message: `Nouveau livre ajouté : "${book.title}"`
     }));
     const authorActivities = authors.map(author => ({
-      id: author.id,
+      id: author._id,
       type: "author",
       name: author.name,
-      timestamp: author.id,
+      timestamp: author._id,
       icon: "👤",
       bgColor: "bg-purple-100",
       iconColor: "text-purple-600",
@@ -84,7 +84,7 @@ export default function Dashboard() {
     toast.custom((t) => (
       <div className="bg-white rounded-2xl shadow-xl p-4 max-w-md border-l-4 border-blue-600">
         <pre className="text-sm font-mono whitespace-pre-wrap">{report}</pre>
-        <button onClick={() => toast.dismiss(t.id)} className="mt-2 text-blue-600 text-sm">
+        <button onClick={() => toast.dismiss(t._id)} className="mt-2 text-blue-600 text-sm">
           Fermer
         </button>
       </div>
@@ -161,7 +161,7 @@ export default function Dashboard() {
             </div>
             <div className="space-y-4">
               {recentActivities.map(activity => (
-                <div key={activity.id} className="flex gap-3">
+                <div key={activity._id} className="flex gap-3">
                   <div className={`w-8 h-8 ${activity.bgColor} rounded-lg flex items-center justify-center ${activity.iconColor} text-sm`}>{activity.icon}</div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">{activity.message}</p>
@@ -180,7 +180,7 @@ export default function Dashboard() {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {topStockBooks.map((book, idx) => (
-                <div key={book.id} className="group">
+                <div key={book._id} className="group">
                   <div className="relative overflow-hidden rounded-xl mb-3">
                     <img src={book.cover || `https://picsum.photos/id/${100 + idx}/300/420`} alt={book.title} className="w-full h-52 object-cover group-hover:scale-105 transition-transform" />
                     <div className="absolute top-2 right-2 bg-white px-2 py-1 rounded text-xs font-bold">#{idx+1}</div>
